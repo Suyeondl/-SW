@@ -28,7 +28,7 @@ const Login =(props)=>{
             if(Readteacher != null){  
                 Readteacher.docs.map((row, idx) =>{ 
                     //PW 일치
-                    if(row.data().t == pwTextInput){
+                    if(row.data().t_pw == pwTextInput){
                         setTeacher(row.data()) //최종 teacher DB 저장
                         alert("success login")
                         //로그인 성공 - Home으로 이동
