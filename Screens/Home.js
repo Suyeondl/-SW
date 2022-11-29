@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
 import { useState } from 'react';
 import { db } from '../firebaseConfig';
-import { collection, getDocs,where, query } from 'firebase/firestore';
+import { collection, getDocs, where, query } from 'firebase/firestore';
 const Home =(props)=>{
     const [testNum, setTestNum] = useState(); //테스트 num DB
 
