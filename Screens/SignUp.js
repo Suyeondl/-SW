@@ -32,9 +32,9 @@ const SignUp =(props)=>{
     const addTeacher = async()=> {
         try{
             await addDoc(collection(db, "Teacher"), {
-                name: nameTextInput,
-                st_id: idTextInput,
-                st_pw: pwTextInput,
+                t_name: nameTextInput,
+                t_id: idTextInput,
+                t_pw: pwTextInput,
                 class: classChoice
             });
             //값 초기화

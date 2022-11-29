@@ -22,13 +22,13 @@ const Login =(props)=>{
     const loginDB = async ()=>{
         try{
             //q:쿼리문,  Readdteacher:쿼리문으로 식별한 DB   
-            const q = await query( collection(db, "Teacher"), where('ta_id',"==", idTextInput))
+            const q = await query( collection(db, "Teacher"), where('t_id',"==", idTextInput))
             const Readteacher = await getDocs(q); 
             //ID존재 
             if(Readteacher != null){  
                 Readteacher.docs.map((row, idx) =>{ 
                     //PW 일치
-                    if(row.data().ta == pwTextInput){
+                    if(row.data().t == pwTextInput){
                         setTeacher(row.data()) //최종 teacher DB 저장
                         alert("success login")
                         //로그인 성공 - Home으로 이동
