@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, ImageBackground } from 'react-native';
 import { useState } from 'react';
 import { db } from '../firebaseConfig';
 import { collection, getDocs, where, query } from 'firebase/firestore';
@@ -7,7 +7,7 @@ const Login =(props)=>{
     const [idTextInput, setIdTextInput] = useState(""); //입력 id
     const [pwTextInput, setPwTextInput] = useState(""); //입력 pw
     const [Teacher, setTeacher] = useState(); //불러온 선생님 정보
-    
+
     //로그인 입력값을 useState(id, pw)에 저장
     const idChangeInput = (event) =>{
         console.log("Input ID", event)
@@ -44,6 +44,7 @@ const Login =(props)=>{
 
     return(
     <View style={styles.mainView}>
+        <ImageBackground source={{uri: "../images/LoginScreen.png"}} resizeMode="cover">
         <Text>Login Screen</Text>
         <TextInput
             value = {idTextInput}
@@ -67,6 +68,7 @@ const Login =(props)=>{
             title = 'Login'
             onPress={loginDB}
         />
+        </ImageBackground>
     </View>
     );
 }
@@ -78,6 +80,11 @@ const styles = StyleSheet.create({
       marginTop:50,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    image: {
+        flex: 1,
+        width: '100%',
+        height: '100%'
     }
 });
 export default Login;

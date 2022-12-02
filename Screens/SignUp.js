@@ -70,7 +70,7 @@ const SignUp =(props)=>{
 
             <Text>Choice Class :</Text>
             <Picker 
-                style={{height:50, width:200,backgroundColor:'pink'}}
+                style={{height:50, width:200,backgroundColor:'darkcyan'}}
                 selectedValue={classChoice}
                 onValueChange={(val,idx)=>setClassChoice(val)}
             >
