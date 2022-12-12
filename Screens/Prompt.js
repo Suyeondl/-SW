@@ -5,26 +5,17 @@ import { collection, getDocs, where, query, doc, updateDoc } from 'firebase/fire
 import { styles } from '../style';
 
 const Prompt =(props)=>{
-    const [promptData,setPromptData] = useState([])
-    const [promptIdx,setPromptIdx] = useState(0)
-    const [countPrompt, setCountPrompt] = useState(); // (prompt개수) - 몇번째 prompt인지 확인하기 위한 count
-    let nowCount = 100;
-
-    //출력할 정보
-    const [studentId, setStudentId] = useState(""); //불러온 studentId
-    const [testId, setTestId] = useState(""); //불러온 testId
-    const [questionId, setQuestionId] = useState(""); //넘겨줄 question key저장
-    const [strategyId, setStrategyId] = useState();
-    const [printQuestion,setPrintQuestion] = useState("") //print할 question 지문 저장
-    const [questionCount, setQuestionCount] = useState();
-    
-    const [promptAnswer, setPromptAnswer] = useState(""); //학생 입력 답 저장
-
-
-    useEffect(()=>{
-        ReadPromptDB()
-    },[])
-   
+    const [promptData,setPromptData] = useState([])//prompt배열
+    const [promptIdx,setPromptIdx] = useState(0)   //인덱스 번호
+    const [countPrompt, setCountPrompt] = useState(); //prompt개수)-몇번째 prompt인지 확인
+    const [studentId, setStudentId] = useState(""); 
+    const [testId, setTestId] = useState(""); 
+    const [questionId, setQuestionId] = useState("");     //문제 id
+    const [strategyId, setStrategyId] = useState();       //전략 id
+    const [printQuestion,setPrintQuestion] = useState("") //question지문
+    const [questionCount, setQuestionCount] = useState(); //현재 문제
+    const [promptAnswer, setPromptAnswer] = useState(""); //학생 입력 prompt answer 저장
+    let nowCount = 100; //prompt개수 확인 및 prompt진행 상태 확인
 
     const ReadPromptDB = async()=>{ 
         const questionId = props.route.params.questionId;
@@ -33,36 +24,24 @@ const Prompt =(props)=>{
         const testId = props.route.params.testId;
         const questionPrint = props.route.params.questionPrint;
         const Count = props.route.params.Count;
-       
         setStudentId(studentId);
         setTestId(testId);
         setQuestionId(questionId);
         setStrategyId(strategyId);
         setPrintQuestion(questionPrint);
         setQuestionCount(Count);
-
-        console.log("Prompt CountNum", Count);
         try{
-            //questionId가 일치하는 prompt 쿼리
-            const q1 = await query( collection(db, "Prompt"), where('questionId',"==", questionId))
+            const q1 = await query( collection(db, "Prompt"), where('questionId',"==", questionId)) 
             const PromptQuestion = await getDocs(q1); //question에 해당하는 모든 prompt 리스트 
-
-            let tempData=[]
+            let tempData=[] //prompt저장
             PromptQuestion.docs.map((doc)=>{
-                //strategy 일치 확인
-                if(doc.data().strategyId === strategyId) {
-
+                if(doc.data().strategyId === strategyId) { //strategy 일치 확인
                     //prompts배열에서 tempData배열로 item하나하나 push
-                    doc.data().prompts.map(item =>{
-                        tempData.push(item) 
-                    })
-                
+                    doc.data().prompts.map(item =>{tempData.push(item)})
                     nowCount = doc.data().count; //prompt개수
                     setCountPrompt(doc.data().count)
-                    console.log("doc.data().count", doc.data().count);
                 }
             })
-            console.log("tempData",tempData)
             setPromptData(tempData)
         }catch(error){
 
@@ -74,23 +53,14 @@ const Prompt =(props)=>{
         const studentId = props.route.params.studentId;
         const testId = props.route.params.testId;
         const Count = props.route.params.Count;
-        //promptIdx
-        //학생 답안 저장
         try{
             const q = await query( collection(db, "AnswerStudent"), where('testId',"==", testId)) 
             const answer = await getDocs(q); //test id일치 답안지
             let docID; //answer의 DB ID
-            answer.docs.map((row, idx)=>{   //학생 아이디 일치 확인************질문 
-                docID = row.id;
-            })
+            answer.docs.map((row, idx)=>{docID = row.id;})
             const docRef = doc(db, "AnswerStudent", docID); //해당 id가진 user업데이트
 
-            /*  
-                Count가      3-(1번문제),    2-(2번문제),    1-(3번문제)
-                strategyId가 0-(A전략),      1-(B전략),      2-(C전략)
-                promptIdx    0-(1번 prompt), 1-(2번 prompt)  2-(3번 prompt)    
-            */
-
+            //답안지 저장 
             let q1_A_p1, q1_A_p2, q1_A_p3, q1_A_p4, q1_A_p5;
             let q1_B_p1, q1_B_p2, q1_B_p3, q1_B_p4;
             let q1_C_p1, q1_C_p2, q1_C_p3, q1_C_p4;
@@ -341,10 +311,10 @@ const Prompt =(props)=>{
 
 
 
-        let newIdx = promptIdx +1 
+        let newIdx = promptIdx +1 //인덱스+1
         setPromptIdx(newIdx)
 
-        if(nowCount == 100){
+        if(nowCount == 100){ //첫prompt인 경우에 nowCount를 DB에서 불러옴
             const questionId = props.route.params.questionId;
             const strategyId = props.route.params.strategyId;
             try{
@@ -356,11 +326,10 @@ const Prompt =(props)=>{
             }catch(error){}
         }
 
-        if(countPrompt == 1) {
+        if(countPrompt == 1) { //count가 1이면 모든 prompt가 종료
             backStrategy();
         }
         else{
-            // nowCount = nowCount-1;
             setCountPrompt(countPrompt-1)
             console.log('change'+ countPrompt);
         }
@@ -384,6 +353,10 @@ const Prompt =(props)=>{
         console.log("Input Answer", event);
         setPromptAnswer(event);
     }
+
+    useEffect(()=>{
+        ReadPromptDB()
+    },[])
 
     return(
         <ImageBackground style={styles.image} source={require("../images/QuestionScreen.png")} resizeMode="cover">

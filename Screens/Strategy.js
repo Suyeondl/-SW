@@ -5,49 +5,39 @@ import { collection, getDocs, where, query } from 'firebase/firestore';
 import { styles } from '../style';
 
 const Strategy =(props)=>{
-    const [AStrategy, setAStrategy] = useState("");
-    const [BStrategy, setBStrategy] = useState("");
+    //전략 지문 저장
+    const [AStrategy, setAStrategy] = useState(""); 
+    const [BStrategy, setBStrategy] = useState(""); 
     const [CStrategy, setCStrategy] = useState("");
-    const [flag, setFlag] = useState(true);
 
-    //전달받은 데이터 저장
-    const [studentId, setStudentId] = useState(""); //불러온 studentId
-    const [testId, setTestId] = useState(""); //불러온 testId
-    const [printQuestion,setPrintQuestion] = useState("") //print할 question
-    const [questionId, setQuestionId] = useState(""); //넘겨줄 question key저장
-    const [questionNum, setQuestionNum] = useState("");
+    //전략 풀이 상태
     const [firstPromptFlag,setFirstPromptFlag] = useState(false)
     const [secondPromptFlag,setSecondPromptFlag] = useState(false)
     const [thridthPromptFlag,setThridPromptFlag] = useState(false)
-    const [questionCount, setQuestionCount] = useState();
+
+    const [studentId, setStudentId] = useState(""); // (StartTest) studentId
+    const [testId, setTestId] = useState("");       // (StartTest) testId
+    const [printQuestion,setPrintQuestion] = useState("")   // 현재 question 지문
+    const [questionId, setQuestionId] = useState("");       // 현재 questionId
+    const [questionCount, setQuestionCount] = useState();   // 문제 진행상태 확인: Count
     const [back, setBack] = useState();
-    //strategy정보를 가져옴(Screen시작 시 바로 실행)
+
+    //strategy DB를 가져옴
     const StrategyDB = async()=>{
         const studentId = props.route.params.studentId;
         const testId = props.route.params.testId;
         const questionId = props.route.params.questionId;
         const questionPrint = props.route.params.questionPrint;
-        const questionNum = props.route.params.questionNum;
         const count = props.route.params.Count;
-        
-        const BackCount = props.route.params.BackCount;
-        console.log(" Strategy Back",BackCount);
-        setBack(BackCount);
-
-
-        setQuestionCount(count);
-        console.log("StartTest Strategy",count);
-
-
+        const BackCount = props.route.params.BackCount; 
+        setBack(BackCount);        //prompt에서 전달받은 count
+        setQuestionCount(count);   //StartTest에서 전달받은 count
         setStudentId(studentId);
         setTestId(testId);
         setQuestionId(questionId);
         setPrintQuestion(questionPrint);
-        if(questionNum == 3)  setQuestionNum(1);
-        else if(questionNum == 2) setQuestionNum(2);
-        else if(questionNum == 1) setQuestionNum(3);
-        //setQuestionNum(questionNum);
 
+        //해당 question 전략 저장
         try{
             const q = await query( collection(db, "Question"), where('key',"==", questionId)) 
             const whatQuestion = await getDocs(q);
@@ -55,36 +45,26 @@ const Strategy =(props)=>{
                 setAStrategy(row.data().strategy[0]); //strategyA
                 setBStrategy(row.data().strategy[1]); //strategyB
                 setCStrategy(row.data().strategy[2]); //strategyC
-                console.log(row.data().strategy[0]);
-                console.log(row.data().strategy[1]);
-                console.log(row.data().strategy[2]);
             })
         }catch(error) { console.log(error.message) }
     }
 
+    //다음 문제 버튼
     const nextQuestion = ()=>{
+        //모든 전략이 true인 경우에 활성화
         if(firstPromptFlag==true && secondPromptFlag==true && thridthPromptFlag==true){
-
             props.navigation.navigate("StartTest", {
                 studentId: studentId,
                 testId: testId,
                 questionId: questionId,
-                nowQuestion: questionNum,
-                Count: (questionCount-1)
+                Count: (questionCount-1) //count -1: 다음문제
             })
         } 
         else alert("Complete all strategies..");
     }
-    //Screen시작하자마자 실행(문제 출력을 위해)
-    // if(flag == true){
-    //     StrategyDB()
-    //     setFlag(false);
-    // }
     useEffect(()=>{
          StrategyDB()
     },[props])
-
-   
 
     return(
         <ImageBackground style={styles.image} source={require("../images/QuestionScreen.png")} resizeMode="cover">
