@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View, Button, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
 import { useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { db } from '../firebaseConfig';
-import { addDoc, collection, getDocs, doc, updateDoc, where, query } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import { styles } from '../style';
 
 const SignUp =(props)=>{
