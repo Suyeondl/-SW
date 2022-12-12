@@ -1,12 +1,13 @@
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
 import { useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { db } from '../firebaseConfig';
 import { addDoc, collection, getDocs, doc, updateDoc, where, query } from 'firebase/firestore';
+import { styles } from '../style';
 
 const SignUp =(props)=>{
     const [nameTextInput, setNameTextInput] = useState(""); //회원가입 name
-    const [idTextInput, setIdTextInput] = useState(""); //회원가입 teacher-id
+    const [idTextInput, setIdTextInput] = useState(""); //회원가입 student-id
     const [pwTextInput, setPwTextInput] = useState(""); //회원가입 pw
     const [classChoice, setClassChoice] = useState(""); //회원가입 class선택
    
@@ -28,17 +29,17 @@ const SignUp =(props)=>{
         setClassTextInput(event)
     }
 
-    //teacher 추가하기(회원가입)
-    const addTeacher = async()=> {
+    //student 추가하기(회원가입)
+    const addStudent = async()=> {
         try{
-            await addDoc(collection(db, "Teacher"), {
-                t_name: nameTextInput,
-                t_id: idTextInput,
-                t_pw: pwTextInput,
+            await addDoc(collection(db, "Student"), {
+                name: nameTextInput,
+                st_id: idTextInput,
+                st_pw: pwTextInput,
                 class: classChoice
             });
             //값 초기화
-            alert("Add Teacher!!")
+            alert("Add Student!!")
             setNameTextInput("")
             setIdTextInput("")
             setPwTextInput("")
@@ -47,30 +48,34 @@ const SignUp =(props)=>{
     }
 
     return(
-        <View>
-            <Text>Signup</Text>
+        <ImageBackground style={styles.image} source={require("../images/SignupScreen.png")} resizeMode="cover">
+        <View style={styles.mainView}>
+            {/* <Text>Signup</Text> */}
+            <Text style={styles.selectText}>Name</Text>
             <TextInput
                 value = {nameTextInput}
                 onChangeText = {nameChangeInput}
-                style={{backgroundColor:"#89EE"}}
-                placeholder = 'Teacher Name'
+                placeholder = 'Student Name'
+                style={styles.text}
             />
+            <Text style={styles.selectText}>ID</Text>
             <TextInput
                 value = {idTextInput}
                 onChangeText = {idChangeInput}
-                style={{backgroundColor:"#89EE"}}
-                placeholder = 'Teacher ID'
+                placeholder = 'Student ID'
+                style={styles.text}
             />
+            <Text style={styles.selectText}>Password</Text>
             <TextInput
                 value = {pwTextInput}
                 onChangeText = {pwChangeInput}
-                style={{backgroundColor:"#89EE"}}
                 placeholder = 'Password'
+                style={styles.text}
             />
 
-            <Text>Choice Class :</Text>
+            <Text style={styles.selectText}>Choice Class :</Text>
             <Picker 
-                style={{height:50, width:200,backgroundColor:'darkcyan'}}
+                style={{height:50, width:180, borderWidth: 1, borderRadius: 3,backgroundColor:'#fffff0'}}
                 selectedValue={classChoice}
                 onValueChange={(val,idx)=>setClassChoice(val)}
             >
@@ -78,17 +83,21 @@ const SignUp =(props)=>{
                 <Picker.Item label="Class 2" value="2"></Picker.Item>
                 <Picker.Item label="Class 3" value="3"></Picker.Item>
             </Picker>
-            <Button
-                title = 'Sign Up'
-                onPress={addTeacher}
-            />
-            <Button
-                title = 'Login'
-                onPress={()=>{
-                    props.navigation.navigate("Login")
-                }}
-            ></Button>
+
+            <TouchableOpacity style={styles.Qbutton} onPress={addStudent}>
+                <Text style={styles.QbuttonText}>Sign Up</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.Qbutton}
+            onPress={()=>{
+                props.navigation.navigate("Login")
+            }}
+            >
+                <Text style={styles.QbuttonText}>Login</Text>
+            </TouchableOpacity>
+
         </View>
+        </ImageBackground>
     );
 }
 export default SignUp;

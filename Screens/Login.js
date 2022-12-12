@@ -1,13 +1,14 @@
-import { StyleSheet, Text, View, Button, TextInput, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
 import { useState } from 'react';
 import { db } from '../firebaseConfig';
 import { collection, getDocs, where, query } from 'firebase/firestore';
+import { styles } from '../style';
 
 const Login =(props)=>{
     const [idTextInput, setIdTextInput] = useState(""); //입력 id
     const [pwTextInput, setPwTextInput] = useState(""); //입력 pw
-    const [Teacher, setTeacher] = useState(); //불러온 선생님 정보
-
+    const [student, setStudent] = useState(); //불러온 student 정보
+    
     //로그인 입력값을 useState(id, pw)에 저장
     const idChangeInput = (event) =>{
         console.log("Input ID", event)
@@ -21,19 +22,19 @@ const Login =(props)=>{
     //로그인 DB
     const loginDB = async ()=>{
         try{
-            //q:쿼리문,  Readdteacher:쿼리문으로 식별한 DB   
-            const q = await query( collection(db, "Teacher"), where('t_id',"==", idTextInput))
-            const Readteacher = await getDocs(q); 
+            //q:쿼리문,  Readstudent:쿼리문으로 식별한 DB   
+            const q = await query( collection(db, "Student"), where('st_id',"==", idTextInput))
+            const Readstudent = await getDocs(q); 
             //ID존재 
-            if(Readteacher != null){  
-                Readteacher.docs.map((row, idx) =>{ 
+            if(Readstudent != null){  
+                Readstudent.docs.map((row, idx) =>{ 
                     //PW 일치
-                    if(row.data().t_pw == pwTextInput){
-                        setTeacher(row.data()) //최종 teacher DB 저장
+                    if(row.data().st_pw == pwTextInput){
+                        setStudent(row.data()) //최종 student DB 저장
                         alert("success login")
                         //로그인 성공 - Home으로 이동
                         props.navigation.navigate("Home", {
-                            teacher: idTextInput
+                            student: idTextInput
                         }) 
                     //PW 불일치
                     }else alert("Password Mismatch")
@@ -43,48 +44,46 @@ const Login =(props)=>{
     }
 
     return(
+    <ImageBackground style={styles.image} source={require("../images/LoginScreen.png")} resizeMode="cover">
     <View style={styles.mainView}>
-        <ImageBackground source={{uri: "../images/LoginScreen.png"}} resizeMode="cover">
-        <Text>Login Screen</Text>
+        {/* <Text>Login Screen</Text> */}
         <TextInput
+            style={styles.text}
             value = {idTextInput}
             onChangeText = {idChangeInput}
-            placeholder = 'Teacher ID'
-            style={{backgroundColor:"#89EE"}}
+            placeholder = 'Student ID'
         />
         <TextInput
+            style={styles.text}
             value = {pwTextInput}
             onChangeText = {pwChangeInput}
             placeholder = 'Password'
-            style={{backgroundColor:"#89EE"}}
         />
-        <Button
+        <TouchableOpacity style={styles.Qbutton}
+        onPress={()=>{
+            props.navigation.navigate("SignUp")
+        }}>
+            <Text style={styles.QbuttonText}>Sign Up</Text>
+            </TouchableOpacity>
+
+        <TouchableOpacity style={styles.Qbutton} onPress={loginDB}>
+            <Text style={styles.QbuttonText}>Login</Text>
+        </TouchableOpacity>
+        {/* <Button
+            color={'#008b8b'}
             title = 'Sign Up'
             onPress={()=>{
                 props.navigation.navigate("SignUp")
             }}
-        />
-        <Button
+        /> */}
+        {/* <Button
+            color={'#008b8b'}
             title = 'Login'
             onPress={loginDB}
-        />
-        </ImageBackground>
+        /> */}
     </View>
+    </ImageBackground>
     );
 }
 
-const styles = StyleSheet.create({
-    mainView: {
-      flex: 1,
-      height:"100%",
-      marginTop:50,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    image: {
-        flex: 1,
-        width: '100%',
-        height: '100%'
-    }
-});
 export default Login;
